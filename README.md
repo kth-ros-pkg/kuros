@@ -4,4 +4,8 @@ A catkin workspace is included with two kuROS nodes and some testclients.
 
 Kuros is dependent on TinyXml2 and Boost. Get these from the official sources. The CMakeLists file expects these to be installed on the system in the standard include locations. Alternatively edit the CmakeLists file to your preference.
 
+Documentation on the kth cvap wiki:
+
+https://cvapwiki.csc.kth.se/dokuwiki/doku.php?id=kuka_850
+
 Mateusz Herczka 2014-08-25
