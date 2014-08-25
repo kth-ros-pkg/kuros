@@ -1,0 +1,12 @@
+<Elements>
+	<Element Tag="ExternalData" Type="STRUCTTAG" Stacksize="1" />
+	<Element Tag="ExternalData.RMode" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.RMs" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.Id" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.Run" Type="BOOLEAN" Stacksize="1" />
+	<Element Tag="ExternalData.Vel" Type="REAL" Stacksize="1" />
+	<Element Tag="ExternalData.Tol" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.FrameType" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.FrameCount" Type="INTEGER" Stacksize="1" />
+	<Element Tag="ExternalData.XFrame" Type="FRAME" Stacksize="1" />
+</Elements>

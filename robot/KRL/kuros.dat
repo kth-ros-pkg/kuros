@@ -1,0 +1,11 @@
+&ACCESS RVP
+&REL 164
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEFDAT  KUROS
+INT mh_response_stream_ms=100
+INT mh_robot_status=4
+
+INT mh_out_traject_id=0
+
+ENDDAT

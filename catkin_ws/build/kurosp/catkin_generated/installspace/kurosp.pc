@@ -1,0 +1,8 @@
+prefix=/home/mh/catkin_ws/install
+
+Name: kurosp
+Description: Description of kurosp
+Version: 0.0.1
+Cflags: -I/home/mh/catkin_ws/install/include
+Libs: -L/home/mh/catkin_ws/install/lib 
+Requires: 

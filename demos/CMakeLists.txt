@@ -1,0 +1,4 @@
+add_subdirectory(kuros_demo)
+add_subdirectory(kuros_demo_block)
+add_subdirectory(kuros_demo_simple)
+add_subdirectory(kurostream_test)

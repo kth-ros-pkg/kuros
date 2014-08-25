@@ -1,0 +1,258 @@
+&ACCESS RVP
+&REL 11
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEF kurostream()
+
+; DECL section
+
+; Kuka's variables
+STRUC str char s[81]
+DECL str sendtext[9]
+DECL str rectext[11]
+DECL char sensorname[40]
+DECL str dummy
+BOOL errbl
+INT  errint
+FRAME extframe
+BOOL bNew
+DECL STATE_T state
+
+; MH Runtime Variables
+INT mh_wait_seconds
+BOOL mh_running
+INT mh_in_traject_id
+REAL mh_velocity
+INT mh_tolerance
+INT mh_frame_type
+; ------------------------------------------------------------------
+; Required INI for security
+; ------------------------------------------------------------------
+GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+INTERRUPT ON 3
+; ------------------------------------------------------------------
+
+; ------------------------------------------------------------------
+; BCO - PTP HOME
+; Robot must do a BCO before anything else
+; ------------------------------------------------------------------
+BAS (#INITMOV,0 )
+$BWDSTART=FALSE		; this prohibits backwards motion
+PDAT_ACT=PDEFAULT
+FDAT_ACT=FHOME
+BAS(#PTP_PARAMS,30)
+$H_POS=XHOME
+; ----------------------
+PTP XHOME	; move home
+; ----------------------
+
+$ADVANCE = mh_advance ; advance pointer lookahead
+
+; Init variables
+mh_wait_seconds = 1
+mh_running = TRUE
+mh_in_traject_id = 1
+mh_velocity=200
+mh_tolerance=20
+mh_frame_type=1
+errint = 0
+
+; Init velocity and approximation tol
+$APO.CDIS = mh_tolerance
+$VEL.CP = (mh_velocity*0.001)
+
+; Create receive structures
+rectext[1].s[] = "Kurostream.ExternalData"
+rectext[2].s[] = "Kurostream.ExternalData.RMode"
+rectext[3].s[] = "Kurostream.ExternalData.RMs"
+rectext[4].s[] = "Kurostream.ExternalData.Id"
+rectext[5].s[] = "Kurostream.ExternalData.Run"
+rectext[6].s[] = "Kurostream.ExternalData.Vel"
+rectext[7].s[] = "Kurostream.ExternalData.Tol"
+rectext[8].s[] = "Kurostream.ExternalData.FrameType"
+rectext[9].s[] = "Kurostream.ExternalData.FrameCount"
+rectext[10].s[] = "Kurostream.ExternalData.XFrame"
+
+; Open channel
+sensorname[]="Kurostream"
+errint = EKX_open(sensorname[])
+EKX_handleerror(errint)
+
+; Wait a little to let channel open
+WAIT SEC mh_wait_seconds
+
+; The channel is open and the server expect data from robot
+; This is the very first message - telling that robot is ready.
+mh_robot_status = 1 ; 1 means BCO done, "Ready"
+
+mh_send_response()	; send status message
+
+WAIT SEC 0 ; break any advance pointer
+
+; ------------------------------------------------------------------
+; Waiting for very first data
+; Once we have a first frame, continue to main loop
+; ------------------------------------------------------------------
+
+; Get Data from stack, only if there are new values
+; The 1 means LIFO "always the last"
+; timeout -1 so we wait forever
+errbl = EKX_WaitForSensorData(1, rectext[1].s[], -1)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+mh_robot_status = 2 ; means we are about to move
+
+mh_send_response()	; send status message
+
+WAIT SEC 0 ; break any advance pointer
+
+; ------------------------------------------------------------------
+; *** Main loop ***
+; From now on robot gets data from stack and moves as fast as it can
+; Important! We ignore a lot of the incoming info here.
+; ------------------------------------------------------------------
+WHILE mh_running == TRUE
+
+
+
+; ------------------------------------------------------------------
+; get id
+errbl = EKX_GetIntegerElement(1, rectext[4].s[], mh_in_traject_id, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+mh_out_traject_id = mh_in_traject_id
+
+; ------------------------------------------------------------------
+; get velocity
+errbl = EKX_GetRealElement(1, rectext[6].s[], mh_velocity, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+; set velocity for trajectory
+$VEL.CP = (mh_velocity*0.001)
+
+; ------------------------------------------------------------------
+; get tolerance
+errbl = EKX_GetIntegerElement(1, rectext[7].s[], mh_tolerance, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+; set tolerance for trajectory
+$APO.CDIS=mh_tolerance
+
+; ------------------------------------------------------------------
+; get running - a zero will terminate main loop after trajectory
+errbl = EKX_GetBoolElement(1, rectext[5].s[], mh_running, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+; ------------------------------------------------------------------
+; get frametype
+errbl = EKX_GetIntegerElement(1, rectext[8].s[], mh_frame_type, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+; get frame
+errbl = EKX_GetFrameElement( 1,  rectext[10].s[], extframe, bNew)
+IF errbl == FALSE THEN
+   HALT
+ENDIF
+
+SWITCH mh_frame_type
+
+CASE 1	; absolute cartesian
+
+; cartesian move with distance approximation
+LIN extframe C_DIS
+
+CASE 3	; relative cartesian
+
+; MOVE (relative) with distance approximation
+LIN_REL extframe C_DIS
+
+DEFAULT
+; only 1 or 3 are supported
+HALT
+
+ENDSWITCH
+
+ENDWHILE
+; ------------------------------------------------------------------
+; End of main loop
+; We get here when mh_running is set to false
+; ------------------------------------------------------------------
+
+WAIT SEC 0 ; break advance pointer
+
+; final report
+mh_robot_status = 0		; 0 means exiting program
+						; id will be the count of corrections performed
+
+mh_send_response() ; send message
+
+; ------------------------------------------------------------------
+; Close channel and exit
+; ------------------------------------------------------------------
+errbl = EKX_close(sensorname[])
+IF errbl == FALSE THEN
+  HALT
+ENDIF
+
+END	; end main program
+
+; ------------------------------------------------------------------
+; Subprogram
+; Report send
+; ------------------------------------------------------------------
+
+DEF mh_send_response()
+INT mh_errint
+
+mh_errint = EKX_WriteInteger("Kurostream.Robot.Status", mh_robot_status)
+EKX_handleerror(mh_errint)
+
+mh_errint = EKX_WriteInteger("Kurostream.Robot.Id", mh_out_traject_id)
+EKX_handleerror(mh_errint)
+
+mh_errint = EKX_WriteInteger("Kurostream.Robot.Tick", $TIMER[1])
+EKX_handleerror(mh_errint)
+
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.X", $pos_act.x)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.Y", $pos_act.y)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.Z", $pos_act.z)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.A", $pos_act.a)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.B", $pos_act.b)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.ActPos.C", $pos_act.c)
+EKX_handleerror(mh_errint)
+
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A1", $axis_act.a1)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A2", $axis_act.a2)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A3", $axis_act.a3)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A4", $axis_act.a4)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A5", $axis_act.a5)
+EKX_handleerror(mh_errint)
+mh_errint = EKX_WriteReal("Kurostream.Robot.Axis.A6", $axis_act.a6)
+EKX_handleerror(mh_errint)
+
+; Send document
+mh_errint = EKX_Send("Kurostream")
+EKX_handleerror(mh_errint)
+
+END

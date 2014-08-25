@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "kurosp")
+set(kurosp_MAINTAINER "Mateusz Herczka <herczka@kth.se>")
+set(kurosp_DEPRECATED "")
+set(kurosp_VERSION "0.0.1")
+set(kurosp_BUILD_DEPENDS "geometry_msgs" "roscpp" "std_msgs" "trajectory_msgs" "message_generation")
+set(kurosp_RUN_DEPENDS "geometry_msgs" "roscpp" "std_msgs" "trajectory_msgs" "message_runtime")
+set(kurosp_BUILDTOOL_DEPENDS "catkin")

@@ -1,0 +1,5 @@
+<ServerConfig>
+	<Port>6008</Port>
+	<MaxBufferSize>1024</MaxBufferSize>
+	<EndString>&#60;&#47;Robot&#62;</EndString>
+</ServerConfig>

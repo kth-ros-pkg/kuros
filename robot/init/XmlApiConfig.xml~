@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- KUKA Roboter GmbH                                                       -->
+<!--                                                                         -->
+<!-- 'InitOnce'   use false only                                             -->
+<!-- 'Channel'    represents a connection to a Sensor. Every channel has     -->
+<!--              the following parameters                                   -->
+<!-- 'SensorName' is the name you give to a sensor. In KRL it serves         -->
+<!--              as a handle to this channel. If the sensor                 -->
+<!--              name, for example, is 'StackCam' there has to be a file    -->
+<!--              called 'StackCam.XML' witch holds the information of the   -->
+<!--              associated  ring buffers  (XML tags)                       -->
+<!-- 'SensorType' is the type or the model name of a sensor.                 -->
+<!-- 'TCP_IP'     holds information about the type of connection, TCP/IP,    -->
+<!--              No other then TCP_IP is realized jet.        		     -->
+<!-- 'IP'         holds the IP of the sensor.                                -->
+<!-- 'Port'       holds the sensor port number of the port you want to       -->
+<!--              connect to.                                                -->
+<!-- 'Route'      if set to 'true' the connection will use ROUTE.EXE. If     -->
+<!--              set to 'false' it will establish a direct connection.      -->
+<!-- 'MapPort'    up to now should be always the same as 'Port'.             -->
+<!--                                                                         -->
+<XmlApiConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="XMLCommunicationSetup.xsd">
+<!--   -->
+<!--   -->
+<XmlApiParam InitOnce="false"/>
+<!--   -->
+<!-- USE DEMOSERVER -->
+<Channel SensorName="SiriusRemote" SensorType="SXT">
+	<TCP_IP IP="130.237.218.24" Port="6008" Route="true" MapPort="6008"/>
+</Channel>
+<Channel SensorName="GalaxyRemote" SensorType="CAM">
+	<TCP_IP IP="192.168.218.100" Port="6007" Route="true" MapPort="6007"/>
+</Channel>
+<Channel SensorName="Legolas" SensorType="CORBA">
+	<TCP_IP IP="130.237.218.89" Port="5001" Route="true" MapPort="5001"/>
+</Channel>
+<Channel SensorName="SampleSensor" SensorType="SXT">
+	<TCP_IP IP="130.237.218.24" Port="6008" Route="true" MapPort="6008"/>
+</Channel>
+<Channel SensorName="Kurostream" SensorType="MH">
+	<TCP_IP IP="192.168.7.107" Port="6008" Route="false" MapPort="6008"/>
+</Channel>
+<Channel SensorName="Kuros" SensorType="Thorin">
+	<TCP_IP IP="192.168.7.106" Port="6008" Route="false" MapPort="6008"/>
+</Channel>
+<!-- END DEMO -->
+</XmlApiConfig>
