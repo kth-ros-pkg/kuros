@@ -186,13 +186,13 @@ ENDIF
 ; set velocity for trajectory
 $VEL.CP = (mh_velocity*0.001) ; for cartesian
 
-
-$VEL_AXIS[1]=(mh_velocity*0.01) ; for axis
-$VEL_AXIS[2]=(mh_velocity*0.01) ; for axis
-$VEL_AXIS[3]=(mh_velocity*0.01) ; for axis
-$VEL_AXIS[4]=(mh_velocity*0.01) ; for axis
-$VEL_AXIS[5]=(mh_velocity*0.01) ; for axis
-$VEL_AXIS[6]=(mh_velocity*0.01) ; for axis
+; the joint space velocity is interpreted in percent (as integer)
+$VEL_AXIS[1]=(mh_velocity) ; for axis
+$VEL_AXIS[2]=(mh_velocity) ; for axis
+$VEL_AXIS[3]=(mh_velocity) ; for axis
+$VEL_AXIS[4]=(mh_velocity) ; for axis
+$VEL_AXIS[5]=(mh_velocity) ; for axis
+$VEL_AXIS[6]=(mh_velocity) ; for axis
 ; ------------------------------------------------------------------
 ; get tolerance
 errbl = EKX_GetIntegerElement(0, rectext[7].s[], mh_tolerance, bNew)
