@@ -22,6 +22,6 @@ add_executable(
 	src/streamtest_main.cpp
 )
 
-target_link_libraries(kurostream_test libkuros.a tinyxml2 boost_system boost_thread)
+target_link_libraries(kurostream_test libkuros_static.a tinyxml2 boost_system boost_thread)
 
 install(TARGETS kurostream_test DESTINATION ${CMAKE_SOURCE_DIR}/bin)

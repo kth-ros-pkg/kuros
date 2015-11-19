@@ -23,6 +23,6 @@ add_executable(
 	src/kuros_demo_main.cpp
 )
 
-target_link_libraries(kuros_demo libkuros.a tinyxml2 boost_system boost_thread)
+target_link_libraries(kuros_demo libkuros_static.a tinyxml2 boost_system boost_thread)
 
 install(TARGETS kuros_demo DESTINATION ${CMAKE_SOURCE_DIR}/bin)

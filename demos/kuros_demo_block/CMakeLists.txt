@@ -20,6 +20,6 @@ add_executable(
 	src/blocking_main.cpp
 )
 
-target_link_libraries(kuros_demo_block libkuros.a tinyxml2 boost_system boost_thread)
+target_link_libraries(kuros_demo_block libkuros_static.a tinyxml2 boost_system boost_thread)
 
 install(TARGETS kuros_demo_block DESTINATION ${CMAKE_SOURCE_DIR}/bin)
